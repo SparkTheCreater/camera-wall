@@ -76,7 +76,7 @@ The page refreshes bitrate and pull state once a second. Fullscreen toggles the 
 
 When the last viewer of a camera disconnects, the server waits 5 seconds, then stops ffmpeg. A player reconnecting inside that window keeps the same pull. If ffmpeg exits while viewers remain, it is started again.
 
-## Development
+## Tests
 
 ```bash
 npm test
@@ -162,7 +162,7 @@ npm start
 
 某一路的最后一位观众断开后，服务等 5 秒再停掉 ffmpeg。播放器在这 5 秒内重连，会继续用原来的拉流。还有人在看时，ffmpeg 自己退出会再启动。
 
-## 开发
+## 测试
 
 ```bash
 npm test
