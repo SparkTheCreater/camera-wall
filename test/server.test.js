@@ -1,3 +1,6 @@
+// Copyright (c) 2026 SparkTheCreater
+// SPDX-License-Identifier: MIT
+
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'

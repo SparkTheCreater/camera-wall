@@ -1,6 +1,8 @@
 {
   "name": "camera-wall",
   "private": true,
+  "license": "MIT",
+  "author": "SparkTheCreater",
   "type": "module",
   "scripts":
   {

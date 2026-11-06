@@ -1,3 +1,6 @@
+// Copyright (c) 2026 SparkTheCreater
+// SPDX-License-Identifier: MIT
+
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import

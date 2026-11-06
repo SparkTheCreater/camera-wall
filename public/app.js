@@ -1,3 +1,6 @@
+// Copyright (c) 2026 SparkTheCreater
+// SPDX-License-Identifier: MIT
+
 const samples = new Map()
 
 const zone =

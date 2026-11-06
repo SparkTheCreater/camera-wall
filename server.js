@@ -1,3 +1,6 @@
+// Copyright (c) 2026 SparkTheCreater
+// SPDX-License-Identifier: MIT
+
 import http from 'node:http'
 import os from 'node:os'
 import path from 'node:path'
