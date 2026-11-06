@@ -25,9 +25,11 @@ from 'node:crypto'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const publicDir = path.join(root, 'public')
+// 12 秒无数据视为卡死。观众还在时 1.2 秒后重拉。最后一位观众离开后再等 5 秒才停。
 const stallMs = 12000
 const restartMs = 1200
 const idleMs = 5000
+// 单个观众积压超过 2MB 就断开，避免慢客户端拖住所有路。
 const maxQueued = 2 * 1024 * 1024
 
 const types =
@@ -40,11 +42,13 @@ const types =
 const pulls = new Map()
 let access = null
 
+// 配置路径。CAMERA_WALL_CONFIG 优先，否则用项目目录里的 config.json。
 function configFile()
 {
   return process.env.CAMERA_WALL_CONFIG || path.join(root, 'config.json')
 }
 
+// 读监听地址和端口。没有 access 时页面不需要登录。
 function applyConfig(next)
 {
   access = next.access || null
@@ -59,6 +63,7 @@ function basicHeader(user, password)
   return 'Basic ' + Buffer.from(user + ':' + password).toString('base64')
 }
 
+// 比对整段 Basic 头。长度不同直接拒绝，避免 timingSafeEqual 抛错。
 function authorized(req)
 {
   if (!access)
@@ -84,11 +89,13 @@ function deny(res)
   res.end()
 }
 
+// 日志里的 RTSP 地址整段换成 rtsp://***，口令不落盘。
 function redact(text)
 {
   return text.replace(/rtsp:\/\/\S+/g, 'rtsp://***')
 }
 
+// 只复制视频，去掉音频，从 stdout 输出 MPEG-TS。不经 shell，URL 作为参数传入。
 function ffmpegArgs(url)
 {
   return [
@@ -121,6 +128,7 @@ function releaseClient(clients, res)
   }
 }
 
+// 把一块视频分给当前观众。写不进去的连接立刻丢掉。
 function fanout(clients, chunk)
 {
   for (const res of clients)
@@ -150,6 +158,7 @@ function logFfmpeg(ctx, buf)
   }
 }
 
+// 进程退出后的重拉。没有观众、正在关机、或已经排过一次，就不再启动。
 function scheduleRestart(ctx)
 {
   ctx.state.running = false
@@ -175,6 +184,7 @@ function onProcessError(ctx, err)
   scheduleRestart(ctx)
 }
 
+// 启动一路 ffmpeg。stdout 进观众，stderr 进日志。退出后交给 scheduleRestart。
 function launch(ctx)
 {
   if (ctx.stopped)
@@ -231,6 +241,7 @@ function streamStalled(proc, lastData, now)
   return Boolean(proc) && now - lastData > stallMs
 }
 
+// 超过 12 秒没有数据就 SIGKILL。进程退出后，还有观众才会重拉。
 function watchPull(ctx)
 {
   if (streamStalled(ctx.proc, ctx.lastData, Date.now()))
@@ -249,6 +260,7 @@ function stopProcess(ctx)
   }
 }
 
+// 还有观众或正在关机时不动。没人看就取消待重连，5 秒后停掉 ffmpeg。
 function releaseIfIdle(ctx)
 {
   if (ctx.clients.size > 0 || ctx.stopped)
@@ -270,6 +282,7 @@ function releaseIfIdle(ctx)
   , idleMs)
 }
 
+// 登记一位观众。这是第一次有人看、且当前没有进程时，才启动拉流。
 function subscribe(ctx, res)
 {
   clearTimeout(ctx.idleTimer)
@@ -292,6 +305,7 @@ function subscribe(ctx, res)
   launch(ctx)
 }
 
+// 关机时停掉这一路。stopped 之后不会再被观众重新拉起。
 function stopPull(ctx, watch)
 {
   ctx.stopped = true
@@ -333,6 +347,7 @@ function createContext(camera, spawnProcess)
   )
 }
 
+// 只建立一路的状态和看门狗，不在这里启动 ffmpeg。
 function createPull(camera, spawnProcess = spawn)
 {
   const ctx = createContext(camera, spawnProcess)
@@ -372,6 +387,7 @@ function uptimeMs(state, now)
   return now - state.startedAt
 }
 
+// 状态接口里的一路。不含 RTSP 地址。
 function cameraView(pull, now)
 {
   return (
@@ -428,6 +444,7 @@ function insidePublic(file)
   return file === publicDir || file.startsWith(publicDir + path.sep)
 }
 
+// 静态文件必须落在 public 目录内，否则当找不到。
 function resolvePublic(pathname)
 {
   const file = path.resolve(publicDir, publicName(pathname))
@@ -470,6 +487,8 @@ function sendFile(res, file)
   res.end(body)
 }
 
+// GET /stream/:id
+// 订阅这一路。第一个观众会把 ffmpeg 拉起来。未知 id 返回 404。
 function openStream(res, id)
 {
   const pull = pulls.get(id)
@@ -494,6 +513,10 @@ function openStream(res, id)
   pull.subscribe(res)
 }
 
+// 只接受 GET。
+// GET /api/status    各路是否在拉、字节数、观众数。不启动拉流。
+// GET /stream/:id    该路的 MPEG-TS。会按需启动拉流。
+// 其他路径           public 目录里的静态文件。/ 即 index.html。
 function handleRequest(req, res)
 {
   if (!authorized(req))
@@ -557,6 +580,7 @@ function addresses()
 
 let closing = false
 
+// 停掉所有拉流再关端口。关不干净时 800 毫秒后仍退出。
 function shutdown(exit = process.exit)
 {
   if (closing)
@@ -580,6 +604,7 @@ function shutdown(exit = process.exit)
   , 800).unref()
 }
 
+// 绑在所有网卡上时，日志列出每块网卡；绑在具体地址上时只打印那个地址。
 function advertisedHosts(endpoint, hosts)
 {
   if (endpoint.host === '0.0.0.0' || endpoint.host === '::')
@@ -601,6 +626,7 @@ function logReady(endpoint, cameras, hosts = addresses())
   }
 }
 
+// 读配置、登记每一路，然后监听。此时还没有 ffmpeg。
 function main()
 {
   const next = JSON.parse(readFileSync(configFile(), 'utf8'))

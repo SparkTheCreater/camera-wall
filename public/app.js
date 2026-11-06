@@ -29,6 +29,7 @@ function formatRate(bps)
   return Math.max(0, Math.round(bps / 1000)) + ' kb/s'
 }
 
+// 用相邻两次状态的字节差算码率。第一次只有一个样本，显示破折号。
 function rateOf(cam, now, store = samples)
 {
   const prev = store.get(cam.id)
@@ -88,6 +89,7 @@ function paint(cameras, wall, summary, now = Date.now())
   }
 }
 
+// 更新码率和拉取状态。画面已经在播时不改覆盖层文字。
 function applyTile(tile, cam, rate)
 {
   tile.dataset.run = cam.running ? '1' : '0'
@@ -103,6 +105,7 @@ function canPlayMpegts(mpegts)
   return Boolean(mpegts) && mpegts.getFeatureList().mseLivePlayback
 }
 
+// 播放器只连 /stream/<id>，不接触摄像头地址。
 function playerSource(id)
 {
   return (
@@ -114,6 +117,7 @@ function playerSource(id)
   )
 }
 
+// 直播低延迟：不攒缓冲，延迟超过 1.5 秒就追。
 function playerConfig()
 {
   return (
@@ -144,6 +148,7 @@ function destroyPlayer(player)
   return null
 }
 
+// 显示失败，1.5 秒后再建一个播放器。
 function failPlayback(session, text)
 {
   session.tile.dataset.mode = 'bad'
@@ -156,6 +161,7 @@ function failPlayback(session, text)
   , 1500)
 }
 
+// 忽略已经拆掉的播放器抛出的错误。
 function onPlayerError(session, token)
 {
   if (token !== session.generation)
@@ -165,6 +171,7 @@ function onPlayerError(session, token)
   failPlayback(session, '信号中断，正在重连')
 }
 
+// 拆掉旧播放器再连这一路。generation 用来丢掉过期的错误回调。
 function beginPlayback(session)
 {
   session.generation += 1
@@ -293,6 +300,7 @@ function renderTile(cam, doc, mpegts)
   return tile
 }
 
+// 按状态接口返回的摄像头建画面。每路立刻开始连接 /stream/<id>。
 function build(cameras, wall, doc, mpegts)
 {
   wall.replaceChildren()
@@ -302,6 +310,7 @@ function build(cameras, wall, doc, mpegts)
   }
 }
 
+// GET /api/status。第一次成功才建画面，之后只刷新数字。
 async function refresh(page)
 {
   let data
@@ -323,6 +332,7 @@ async function refresh(page)
   page.paint(data.cameras)
 }
 
+// 页面入口。时钟和状态都是每秒一次。
 function boot()
 {
   const wall = document.querySelector('.wall')
