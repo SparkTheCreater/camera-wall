@@ -11,6 +11,7 @@ Watch several IP camera main streams in one browser page. The server pulls RTSP 
 ## Features
 
 - One tile per camera, with bitrate, pull state, and fullscreen.
+- Splits the wall into equal cells from the camera count, as close to a square as that count allows. One camera fills the page. Two sit side by side. Three and four use two rows of two. Five and six use three columns. A narrow window stacks the tiles.
 - Pulls a camera only while someone is watching it. The last viewer leaving stops that pull after 5 seconds.
 - Restarts a pull that dies while viewers are still connected.
 - Optional HTTP basic authentication for the page and the streams.
@@ -105,6 +106,7 @@ This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 Sp
 ## 功能
 
 - 每路一个画面，显示码率、拉取状态，可以全屏。
+- 按配置里的摄像头数量平均分屏，每格一样大，行列尽量接近正方形。1 路铺满，2 路并排，3 路和 4 路是两行两列，5 路和 6 路是三列。窗口很窄时改成上下排列。
 - 有人看某一路才拉那一路。最后一位观众离开 5 秒后停止。
 - 还有人在看时，拉流中断会重新拉起。
 - 页面和视频流可以加 HTTP 基本认证。
