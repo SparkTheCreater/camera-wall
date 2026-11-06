@@ -82,6 +82,12 @@ When the last viewer of a camera disconnects, the server waits 5 seconds, then s
 npm test
 ```
 
+## License
+
+This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 SparkTheCreater.
+
+[mpegts.js](https://github.com/xqq/mpegts.js) in `public/vendor/mpegts.js` is included under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). Copyright (C) 2021 magicxqq.
+
 ---
 
 # 监控墙
@@ -167,3 +173,9 @@ npm start
 ```bash
 npm test
 ```
+
+## 协议
+
+本项目以 [MIT License](LICENSE) 授权。Copyright (c) 2026 SparkTheCreater。
+
+`public/vendor/mpegts.js` 中的 [mpegts.js](https://github.com/xqq/mpegts.js) 另行遵循 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)。Copyright (C) 2021 magicxqq。
