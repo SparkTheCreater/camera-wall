@@ -86,6 +86,7 @@ npm start
 打开页面先看状态，然后每一路画面连接自己的流。这次连接才会启动 ffmpeg。
 
 ```mermaid
+%%{init: {'themeVariables': {'fontSize': '12px'}, 'sequence': {'useMaxWidth': false, 'mirrorActors': false, 'actorMargin': 20, 'width': 64, 'height': 20, 'messageMargin': 12, 'diagramMarginX': 4, 'diagramMarginY': 2, 'actorFontSize': 12, 'messageFontSize': 12, 'noteFontSize': 12}}}%%
 sequenceDiagram
   participant Browser as 浏览器
   participant Server as 服务
@@ -107,6 +108,7 @@ sequenceDiagram
 拉流存在时，只在还有人看的情况下继续。
 
 ```mermaid
+%%{init: {'themeVariables': {'fontSize': '12px'}, 'flowchart': {'useMaxWidth': false, 'nodeSpacing': 10, 'rankSpacing': 16, 'padding': 2}}}%%
 flowchart TD
   chunk["收到一块 MPEG-TS"] --> fanout["发给当前观众"]
   fanout --> slow{"某一位积压超过 2MB?"}

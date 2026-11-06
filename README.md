@@ -86,6 +86,7 @@ When the last viewer of a camera disconnects, the server waits 5 seconds, then s
 Opening the page checks status, then each tile connects to its own stream. That connection is what starts ffmpeg.
 
 ```mermaid
+%%{init: {'themeVariables': {'fontSize': '12px'}, 'sequence': {'useMaxWidth': false, 'mirrorActors': false, 'actorMargin': 20, 'width': 64, 'height': 20, 'messageMargin': 12, 'diagramMarginX': 4, 'diagramMarginY': 2, 'actorFontSize': 12, 'messageFontSize': 12, 'noteFontSize': 12}}}%%
 sequenceDiagram
   participant Browser
   participant Server
@@ -107,6 +108,7 @@ sequenceDiagram
 While a pull exists, the server keeps it only when someone is still watching.
 
 ```mermaid
+%%{init: {'themeVariables': {'fontSize': '12px'}, 'flowchart': {'useMaxWidth': false, 'nodeSpacing': 10, 'rankSpacing': 16, 'padding': 2}}}%%
 flowchart TD
   chunk["MPEG-TS chunk"] --> fanout["Send to current viewers"]
   fanout --> slow{"One viewer queued over 2 MB?"}
