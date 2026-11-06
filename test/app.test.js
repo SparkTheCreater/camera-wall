@@ -10,6 +10,7 @@ import
   bindPlayer,
   build,
   canPlayMpegts,
+  gridShape,
   destroyPlayer,
   failPlayback,
   formatRate,
@@ -46,6 +47,20 @@ function element(tag)
     autoplay: false,
     playsInline: false,
     requested: false,
+    style:
+    {
+      values: {},
+      setProperty(name, value)
+      {
+        this.values[name] = value
+      }
+      ,
+      getPropertyValue(name)
+      {
+        return this.values[name] || ''
+      }
+    }
+    ,
     setAttribute(name, value)
     {
       el.attrs[name] = value
@@ -430,6 +445,29 @@ test('refresh builds once and reports a dead status call', async () =>
   assert.equal(built.length, 1)
   assert.equal(painted.length, 2)
   assert.deepEqual(failures, ['', '', '状态接口暂时连不上'])
+}
+)
+
+test('the wall splits into an even grid for the camera count', () =>
+{
+  assert.deepEqual(gridShape(0), { columns: 1, rows: 1 })
+  assert.deepEqual(gridShape(1), { columns: 1, rows: 1 })
+  assert.deepEqual(gridShape(2), { columns: 2, rows: 1 })
+  assert.deepEqual(gridShape(3), { columns: 2, rows: 2 })
+  assert.deepEqual(gridShape(4), { columns: 2, rows: 2 })
+  assert.deepEqual(gridShape(5), { columns: 3, rows: 2 })
+  assert.deepEqual(gridShape(6), { columns: 3, rows: 2 })
+  assert.deepEqual(gridShape(9), { columns: 3, rows: 3 })
+  const wall = element('main')
+  const doc =
+  {
+    fullscreenElement: null,
+    createElement: element,
+    exitFullscreen() { return Promise.resolve() }
+  }
+  build([{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }], wall, doc, null)
+  assert.equal(wall.style.getPropertyValue('--columns'), '2')
+  assert.equal(wall.style.getPropertyValue('--rows'), '2')
 }
 )
 

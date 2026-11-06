@@ -95,8 +95,8 @@ h1
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-content: center;
+  grid-template-columns: repeat(var(--columns, 1), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows, 1), minmax(0, 1fr));
   gap: 10px;
   padding: 0 10px 10px;
   overflow: auto;
@@ -106,8 +106,9 @@ h1
 {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: calc(100vh - 88px);
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
   background: #000;
   border: 1px solid rgba(215, 230, 210, 0.14);
@@ -251,13 +252,14 @@ video
 
   .wall
   {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
   }
 
   .tile
   {
     aspect-ratio: 16 / 9;
-    max-height: none;
+    height: auto;
   }
 
   .label em

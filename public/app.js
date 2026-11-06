@@ -303,9 +303,28 @@ function renderTile(cam, doc, mpegts)
   return tile
 }
 
+// 按数量取接近正方形的行列，每一格一样大。
+function gridShape(count)
+{
+  const total = Math.max(count, 1)
+  const columns = Math.ceil(Math.sqrt(total))
+  return {
+    columns,
+    rows: Math.ceil(total / columns)
+  }
+}
+
+function layoutWall(wall, count)
+{
+  const shape = gridShape(count)
+  wall.style.setProperty('--columns', String(shape.columns))
+  wall.style.setProperty('--rows', String(shape.rows))
+}
+
 // 按状态接口返回的摄像头建画面。每路立刻开始连接 /stream/<id>。
 function build(cameras, wall, doc, mpegts)
 {
+  layoutWall(wall, cameras.length)
   wall.replaceChildren()
   for (const cam of cameras)
   {
@@ -398,6 +417,7 @@ export
   destroyPlayer,
   failPlayback,
   formatRate,
+  gridShape,
   markLive,
   onPlayerError,
   paint,
