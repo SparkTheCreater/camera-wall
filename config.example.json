@@ -1,0 +1,26 @@
+{
+  "host": "0.0.0.0",
+  "port": 8090,
+  "access":
+  {
+    "user": "wall",
+    "password": "change-me"
+  },
+  "cameras":
+  [
+    {
+      "id": "gate",
+      "name": "大门",
+      "host": "192.0.2.10",
+      "channel": "101",
+      "url": "rtsp://user:password@192.0.2.10:554/Streaming/Channels/101"
+    },
+    {
+      "id": "yard",
+      "name": "院子",
+      "host": "192.0.2.11",
+      "channel": "101",
+      "url": "rtsp://user:password@192.0.2.11:554/Streaming/Channels/101"
+    }
+  ]
+}

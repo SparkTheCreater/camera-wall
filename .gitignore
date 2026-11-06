@@ -1,0 +1,6 @@
+config.json
+server.log
+server.pid
+coverage/
+.metrics/
+node_modules/

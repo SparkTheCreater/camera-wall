@@ -1,0 +1,11 @@
+{
+  "name": "camera-wall",
+  "private": true,
+  "type": "module",
+  "scripts":
+  {
+    "start": "node server.js",
+    "test": "node --test",
+    "coverage": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage/lcov.info"
+  }
+}
