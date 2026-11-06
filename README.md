@@ -81,6 +81,47 @@ The page refreshes bitrate and pull state once a second. Fullscreen toggles the 
 
 When the last viewer of a camera disconnects, the server waits 5 seconds, then stops ffmpeg. A player reconnecting inside that window keeps the same pull. If ffmpeg exits while viewers remain, it is started again.
 
+## Flow
+
+Opening the page checks status, then each tile connects to its own stream. That connection is what starts ffmpeg.
+
+```mermaid
+sequenceDiagram
+  participant Browser
+  participant Server
+  participant FFmpeg
+  participant Camera
+  Browser->>Server: GET /api/status
+  Server-->>Browser: cameras, not pulling
+  Browser->>Server: GET /stream/id
+  Server->>FFmpeg: spawn
+  FFmpeg->>Camera: RTSP
+  Camera-->>FFmpeg: video
+  FFmpeg-->>Server: MPEG-TS
+  Server-->>Browser: MPEG-TS
+  Browser->>Server: last viewer disconnects
+  Note over Server: wait 5 seconds
+  Server->>FFmpeg: stop
+```
+
+While a pull exists, the server keeps it only when someone is still watching.
+
+```mermaid
+flowchart TD
+  chunk["MPEG-TS chunk"] --> fanout["Send to current viewers"]
+  fanout --> slow{"One viewer queued over 2 MB?"}
+  slow -->|yes| drop["Drop that viewer"]
+  slow -->|no| keep["Keep the viewer"]
+  stall["No data for 12 seconds"] --> kill["Kill ffmpeg"]
+  kill --> viewers{"Viewers remain?"}
+  viewers -->|yes| again["Start ffmpeg again after 1.2 seconds"]
+  viewers -->|no| stopped["Stay stopped"]
+  leave["Last viewer left"] --> wait["Wait 5 seconds"]
+  wait --> returned{"A viewer returned?"}
+  returned -->|yes| keep
+  returned -->|no| stopped
+```
+
 ## Tests
 
 ```bash

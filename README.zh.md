@@ -81,6 +81,47 @@ npm start
 
 某一路的最后一位观众断开后，服务等 5 秒再停掉 ffmpeg。播放器在这 5 秒内重连，会继续用原来的拉流。还有人在看时，ffmpeg 自己退出会再启动。
 
+## 流程
+
+打开页面先看状态，然后每一路画面连接自己的流。这次连接才会启动 ffmpeg。
+
+```mermaid
+sequenceDiagram
+  participant Browser as 浏览器
+  participant Server as 服务
+  participant FFmpeg as ffmpeg
+  participant Camera as 摄像头
+  Browser->>Server: GET /api/status
+  Server-->>Browser: 各路未在拉
+  Browser->>Server: GET /stream/id
+  Server->>FFmpeg: 启动
+  FFmpeg->>Camera: RTSP
+  Camera-->>FFmpeg: 视频
+  FFmpeg-->>Server: MPEG-TS
+  Server-->>Browser: MPEG-TS
+  Browser->>Server: 最后一位观众断开
+  Note over Server: 等待 5 秒
+  Server->>FFmpeg: 停止
+```
+
+拉流存在时，只在还有人看的情况下继续。
+
+```mermaid
+flowchart TD
+  chunk["收到一块 MPEG-TS"] --> fanout["发给当前观众"]
+  fanout --> slow{"某一位积压超过 2MB?"}
+  slow -->|yes| drop["断开这一位"]
+  slow -->|no| keep["保留这一位"]
+  stall["12 秒没有数据"] --> kill["杀掉 ffmpeg"]
+  kill --> viewers{"还有观众?"}
+  viewers -->|yes| again["1.2 秒后重新启动"]
+  viewers -->|no| stopped["保持停止"]
+  leave["最后一位观众离开"] --> wait["等待 5 秒"]
+  wait --> returned{"有人回来?"}
+  returned -->|yes| keep
+  returned -->|no| stopped
+```
+
 ## 测试
 
 ```bash
