@@ -1,5 +1,7 @@
 # Camera Wall
 
+English | [中文](README.zh.md)
+
 Put home cameras on one wall and show them together. Streams come in over RTSP. To turn RTSP on for a home camera, ask that brand's support.
 
 Watch several IP camera main streams in one browser page. The server pulls RTSP with ffmpeg and remuxes it to MPEG-TS. The page plays that with [mpegts.js](https://github.com/xqq/mpegts.js) 1.8.0. Camera URLs stay on the server. The browser only receives `/stream/<id>`.
@@ -90,98 +92,3 @@ npm test
 This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 SparkTheCreater.
 
 [mpegts.js](https://github.com/xqq/mpegts.js) in `public/vendor/mpegts.js` is included under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). Copyright (C) 2021 magicxqq.
-
----
-
-# 监控墙
-
-家用摄像头上墙，同步显示，基于 RTSP。家用摄像头如何打开 RTSP，可以咨询对应品牌的客服。
-
-在一个浏览器页面里同时看多路网络摄像头的主码流。服务端用 ffmpeg 把 RTSP 转成 MPEG-TS，页面用 [mpegts.js](https://github.com/xqq/mpegts.js) 1.8.0 播放。摄像头地址只留在服务端，浏览器拿到的是 `/stream/<id>`。
-
-<p align="center">
-  <img src="docs/preview.jpg" alt="监控墙同时播放两路主码流">
-</p>
-
-## 功能
-
-- 每路一个画面，显示码率、拉取状态，可以全屏。
-- 按配置里的摄像头数量平均分屏，每格一样大，行列尽量接近正方形。1 路铺满，2 路并排，3 路和 4 路是两行两列，5 路和 6 路是三列。窗口很窄时改成上下排列。
-- 有人看某一路才拉那一路。最后一位观众离开 5 秒后停止。
-- 还有人在看时，拉流中断会重新拉起。
-- 页面和视频流可以加 HTTP 基本认证。
-- 摄像头口令不会出现在页面或 `/api/status` 里。
-
-## 快速开始
-
-需要 Node.js，并且 ffmpeg 在 `PATH` 里。
-
-```bash
-cp config.example.json config.json
-npm start
-```
-
-启动前改好 `config.json`。`host` 为 `0.0.0.0` 时，终端会打印每块网卡的地址。打开其中的地址。
-
-`config.json` 已在 `.gitignore` 里。里面有摄像头口令，不要提交。
-
-## 配置
-
-完整示例是 `config.example.json`。里面的地址属于文档用网段 `192.0.2.0/24`，换成自己的摄像头。
-
-最少可以写成：
-
-```json
-{
-  "host": "0.0.0.0",
-  "port": 8090,
-  "cameras":
-  [
-    {
-      "id": "gate",
-      "name": "大门",
-      "host": "192.0.2.10",
-      "channel": "101",
-      "url": "rtsp://user:password@192.0.2.10:554/Streaming/Channels/101"
-    }
-  ]
-}
-```
-
-| 字段 | 含义 |
-| --- | --- |
-| `host` | 监听地址。`0.0.0.0` 和 `::` 表示所有网卡，启动日志会列出每个 IPv4 地址。写成其他地址就只绑那一个。 |
-| `port` | 端口。 |
-| `access` | 可选的 HTTP 基本认证。删掉这一段，页面就不需要登录。 |
-| `access.user` | 网页用户名。 |
-| `access.password` | 网页口令。 |
-| `cameras` | 每一路摄像头。页面为每一项建一个画面。 |
-| `cameras[].id` | 流编号。只能用字母、数字、`_` 和 `-`。对应 `/stream/<id>`。 |
-| `cameras[].name` | 画面上的名字。 |
-| `cameras[].host` | 显示在页面和日志里。不拿来连接摄像头。 |
-| `cameras[].channel` | 显示在页面和日志里。 |
-| `cameras[].url` | 交给 ffmpeg 的 RTSP 地址，用户名和口令写在这里。 |
-
-海康主码流常见路径是 `/Streaming/Channels/101`。
-
-要换配置文件路径，设置 `CAMERA_WALL_CONFIG`。
-
-## 行为
-
-打开页面后，每一路播放器会连接 `/stream/<id>`，这时才启动那一路的 ffmpeg。只打开 HTML 或请求 `/api/status` 不会拉流。
-
-页面每秒刷新码率和拉取状态。点「全屏」放大当前这一路。
-
-某一路的最后一位观众断开后，服务等 5 秒再停掉 ffmpeg。播放器在这 5 秒内重连，会继续用原来的拉流。还有人在看时，ffmpeg 自己退出会再启动。
-
-## 测试
-
-```bash
-npm test
-```
-
-## 协议
-
-本项目以 [MIT License](LICENSE) 授权。Copyright (c) 2026 SparkTheCreater。
-
-`public/vendor/mpegts.js` 中的 [mpegts.js](https://github.com/xqq/mpegts.js) 另行遵循 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)。Copyright (C) 2021 magicxqq。
