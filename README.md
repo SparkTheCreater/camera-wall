@@ -1,5 +1,7 @@
 # Camera Wall
 
+Put home cameras on one wall and show them together. Streams come in over RTSP. To turn RTSP on for a home camera, ask that brand's support.
+
 Watch several IP camera main streams in one browser page. The server pulls RTSP with ffmpeg and remuxes it to MPEG-TS. The page plays that with [mpegts.js](https://github.com/xqq/mpegts.js) 1.8.0. Camera URLs stay on the server. The browser only receives `/stream/<id>`.
 
 <p align="center">
@@ -91,6 +93,8 @@ This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 Sp
 ---
 
 # 监控墙
+
+家用摄像头上墙，同步显示，基于 RTSP。家用摄像头如何打开 RTSP，可以咨询对应品牌的客服。
 
 在一个浏览器页面里同时看多路网络摄像头的主码流。服务端用 ffmpeg 把 RTSP 转成 MPEG-TS，页面用 [mpegts.js](https://github.com/xqq/mpegts.js) 1.8.0 播放。摄像头地址只留在服务端，浏览器拿到的是 `/stream/<id>`。
 
