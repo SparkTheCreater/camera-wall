@@ -86,7 +86,7 @@ npm start
 打开页面先看状态，然后每一路画面连接自己的流。这次连接才会启动 ffmpeg。
 
 ```mermaid
-%%{init: {'themeVariables': {'fontSize': '12px'}, 'sequence': {'useMaxWidth': false, 'mirrorActors': false, 'actorMargin': 20, 'width': 64, 'height': 20, 'messageMargin': 12, 'diagramMarginX': 4, 'diagramMarginY': 2, 'actorFontSize': 12, 'messageFontSize': 12, 'noteFontSize': 12}}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px', 'fontFamily': '-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', 'background': '#ffffff', 'primaryColor': '#f6f8fa', 'primaryTextColor': '#1f2328', 'primaryBorderColor': '#d0d7de', 'lineColor': '#59636e', 'textColor': '#1f2328', 'actorBkg': '#f6f8fa', 'actorBorder': '#d0d7de', 'actorTextColor': '#1f2328', 'actorLineColor': '#d0d7de', 'signalColor': '#1f2328', 'signalTextColor': '#1f2328', 'noteBkgColor': '#fff8c5', 'noteBorderColor': '#d4a72c', 'noteTextColor': '#1f2328', 'labelBoxBkgColor': '#ddf4ff', 'labelBoxBorderColor': '#54aeff', 'labelTextColor': '#1f2328'}, 'sequence': {'useMaxWidth': false, 'mirrorActors': false, 'actorMargin': 20, 'width': 64, 'height': 20, 'messageMargin': 12, 'diagramMarginX': 4, 'diagramMarginY': 2, 'actorFontSize': 12, 'messageFontSize': 12, 'noteFontSize': 12}}}%%
 sequenceDiagram
   participant Browser as 浏览器
   participant Server as 服务
@@ -108,7 +108,7 @@ sequenceDiagram
 拉流存在时，只在还有人看的情况下继续。
 
 ```mermaid
-%%{init: {'themeVariables': {'fontSize': '12px'}, 'flowchart': {'useMaxWidth': false, 'nodeSpacing': 10, 'rankSpacing': 16, 'padding': 2}}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px', 'fontFamily': '-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif', 'background': '#ffffff', 'lineColor': '#59636e', 'textColor': '#1f2328'}, 'flowchart': {'useMaxWidth': false, 'nodeSpacing': 10, 'rankSpacing': 16, 'padding': 2}}}%%
 flowchart TD
   chunk["收到一块 MPEG-TS"] --> fanout["发给当前观众"]
   fanout --> slow{"某一位积压超过 2MB?"}
@@ -122,6 +122,14 @@ flowchart TD
   wait --> returned{"有人回来?"}
   returned -->|yes| keep
   returned -->|no| stopped
+  classDef plain fill:#f6f8fa,stroke:#d0d7de,color:#1f2328
+  classDef ask fill:#ddf4ff,stroke:#0969da,color:#1f2328
+  classDef go fill:#dafbe1,stroke:#1a7f37,color:#1f2328
+  classDef stop fill:#ffebe9,stroke:#cf222e,color:#1f2328
+  class chunk,fanout,stall,kill,leave,wait plain
+  class slow,viewers,returned ask
+  class keep,again go
+  class drop,stopped stop
 ```
 
 ## 测试
